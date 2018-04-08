@@ -2,7 +2,7 @@
 
 ### 说明
 
-在minix 3.3.0操作系统系统PCB中添加计时器，到时间后发送信号终止进程。将调用过chrt的进程优先级记为7，每次挑选最早结束的进程执行。
+在minix 3.3.0操作系统系统PCB中添加计时器，到时间后发送信号终止进程。将调用过chrt的进程优先级记为0，最先被遍历到，每次挑选最早结束的进程执行。
 
 ### 应用层
 
@@ -267,14 +267,14 @@ void enqueue(
 )
 {
   if (rp->ddl_timer.tmr_exp_time > 0)
-  	rp->p_priority = 7;
+  	rp->p_priority = 0;
   ...
 }
 ...
 static void enqueue_head(struct proc *rp)
 {
   if (rp->ddl_timer.tmr_exp_time > 0)
-  	rp->p_priority = 7;
+  	rp->p_priority = 0;
   ...
 }
 ...
@@ -307,7 +307,7 @@ static struct proc * pick_proc(void)
 		TRACE(VF_PICKPROC, printf("cpu %d queue %d empty\n", cpuid, q););
 		continue;
 	}
-	if (q == 7) {
+	if (q == 0) {
 		// loop out the earliest deadline process and pick it
 		rp = rdy_head[q];
 		tmp = rp->p_nextready;
