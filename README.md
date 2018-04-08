@@ -258,7 +258,7 @@ struct proc {
 };
 ```
 
-2.修改入队操作，将chrt进程优先级记作7 /usr/src/minix/kernel/proc.c
+2.修改入队操作，将chrt进程优先级记作0 /usr/src/minix/kernel/proc.c
 
 ```c
 ...
