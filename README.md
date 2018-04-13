@@ -333,20 +333,45 @@ static struct proc * pick_proc(void)
 
 ```c
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int main() {
-    pid_t pid;
-    chrt(5);
-    if (!(pid = fork())) {
-        chrt(5);
-        sleep(1);
-        exit(0);
-    }
-    sleep(10);
-    return 0;
+	pid_t p1, p2, p3;
+	int loop;
+	loop = 0;
+	p1 = fork();
+	if (!p1) {
+		chrt(20);
+		p1 = getpid();
+		while (1) {
+			sleep(1);
+			printf("P1 pid: %d heart beat: %d\n", p1, loop++);
+			if (loop == 5)
+				chrt(5);
+		}
+	}
+	p2 = fork();
+	if (!p2) {
+		chrt(15);
+		p2 = getpid();
+		while (1) {
+			sleep(1);
+			printf("P2 pid: %d heart beat: %d\n", p2, loop++);
+		}
+	}
+	p3 = fork();
+	if (!p3) {
+		p3 = getpid();
+		while (1) {
+			sleep(1);
+			printf("P3 pid: %d heart beat: %d\n", p3, loop++);
+			if (loop == 10)
+				chrt(3);
+		}
+	}
+	return 0;
 }
 ```
 
-正常运行。父进程被终止，子进程正常退出。
+正常运行。首先交替输出P2P1P3心跳，第五秒后变P1P2P3心跳，第十秒P1被终止显示P3P2心跳，第十三秒P3被终止只剩P2，第15秒P2被终止。
