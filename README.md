@@ -170,38 +170,7 @@ int do_chrt(struct proc *caller_ptr, message *m_ptr)
 }
 ```
 
-3.修改do_exit实现，回收退出进程的计时器 /usr/src/minix/kernel/system/do_exit.c
-
-```c
-/* The kernel call implemented in this file:
- *   m_type:	SYS_EXIT
- */
-#include "kernel/system.h"
-#include "kernel/clock.h"
-#include <signal.h>
-
-#if USE_EXIT
-
-/*===========================================================================*
- *				 do_exit				     *
- *===========================================================================*/
-int do_exit(struct proc * caller, message * m_ptr)
-{
-/* Handle sys_exit. A system process has requested to exit. Generate a
- * self-termination signal.
- */
-  int sig_nr = SIGABRT;
-
-  cause_sig(caller->p_nr, sig_nr);      /* send a signal to the caller */
-  reset_kernel_timer(&caller->ddl_timer);	/* clear chrt timer */
-  caller->ddl_timer.tmr_exp_time = 0;
-  return(EDONTREPLY);			/* don't reply */
-}
-
-#endif /* USE_EXIT */
-```
-
-4.修改Makefile文件 /usr/src/minix/kernel/system/Makefile.inc
+3.修改Makefile文件 /usr/src/minix/kernel/system/Makefile.inc
 
 ```makefile
 SRCS+= 	\
@@ -209,7 +178,7 @@ SRCS+= 	\
 	do_chrt.c
 ```
 
-5.定义内核调用号  /usr/src/minix/include/minix/com.h
+4.定义内核调用号  /usr/src/minix/include/minix/com.h
 
 ```c
 ...
@@ -219,7 +188,7 @@ SRCS+= 	\
 ...
 ```
 
-6.映射内核调用到内核调用号  /usr/src/minix/kernel/system.c
+5.映射内核调用到内核调用号  /usr/src/minix/kernel/system.c
 
 ```c
   ...
@@ -229,7 +198,7 @@ SRCS+= 	\
   ...
 ```
 
-7.映射内核调用到system_tab /usr/src/minix/commands/service/parse.c
+6.映射内核调用到system_tab /usr/src/minix/commands/service/parse.c
 
 ```c
 ...
